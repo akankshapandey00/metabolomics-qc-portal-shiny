@@ -27,9 +27,7 @@ This project complements tools like **MetaboAnalyst** (it is *not* meant to repl
 - [Install and run](#install-and-run)
 - [Repo structure](#repo-structure)
 - [Development notes](#development-notes)
-- [Troubleshooting](#troubleshooting)
-- [Limitations](#limitations)
-- [License](#license)
+
 
 ---
 
