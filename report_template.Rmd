@@ -1,0 +1,106 @@
+---
+title: "Metabolomics QC Report"
+output:
+  html_document:
+    self_contained: true
+params:
+  report_date: !r Sys.Date()
+  dataset_name: "Uploaded dataset"
+
+  # These file paths get passed in by the Shiny app when you click "Download HTML report"
+  qc_sample_csv: NULL
+  qc_feature_csv: NULL
+  pca_scores_csv: NULL
+  pca_loadings_csv: NULL
+
+  # Plot settings passed from the app
+  pca_color_col: ""
+  pca_x_pc: "PC1"
+  pca_y_pc: "PC2"
+
+  # How much to show in the report
+  top_n_loadings: 10
+  qc_feature_preview_n: 200
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(readr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Overview
+- **Report date:** `r params$report_date`
+- **Dataset:** `r params$dataset_name`
+- **PCA axes:** `r params$pca_x_pc` vs `r params$pca_y_pc`
+- **Color by:** `r ifelse(is.null(params$pca_color_col) || params$pca_color_col == "", "None", params$pca_color_col)`
+- **QC feature preview rows:** `r params$qc_feature_preview_n`
+- **Top loadings shown:** `r params$top_n_loadings`
+
+---
+
+## QC by sample
+```{r}
+qc_sample <- read_csv(params$qc_sample_csv, show_col_types = FALSE)
+qc_sample
+```
+
+---
+
+## QC by feature (preview)
+```{r}
+qc_feature <- read_csv(params$qc_feature_csv, show_col_types = FALSE)
+
+n_show <- params$qc_feature_preview_n
+if (is.null(n_show) || is.na(n_show) || n_show <= 0) n_show <- 200
+
+qc_feature %>% head(n_show)
+```
+
+---
+
+## PCA
+```{r}
+scores <- read_csv(params$pca_scores_csv, show_col_types = FALSE)
+
+x_pc <- params$pca_x_pc
+y_pc <- params$pca_y_pc
+color_col <- params$pca_color_col
+
+p <- if (!is.null(color_col) && color_col != "" && color_col %in% names(scores)) {
+  ggplot(scores, aes(x = .data[[x_pc]], y = .data[[y_pc]], color = .data[[color_col]])) +
+    geom_point(size = 3, alpha = 0.9) +
+    labs(x = x_pc, y = y_pc, color = color_col)
+} else {
+  ggplot(scores, aes(x = .data[[x_pc]], y = .data[[y_pc]])) +
+    geom_point(size = 3, alpha = 0.9) +
+    labs(x = x_pc, y = y_pc)
+}
+
+p + theme_bw() + theme(panel.grid.minor = element_blank())
+```
+
+---
+
+## Top PCA loadings
+```{r}
+# The app already writes a CSV that contains only the top loadings,
+# so the report just reads it and shows it.
+loadings <- read_csv(params$pca_loadings_csv, show_col_types = FALSE)
+loadings
+```
+
+---
+
+## Notes
+- **QC by sample/feature** is computed from the selected intensity columns in the uploaded feature table.
+- **PCA** is computed on log1p-transformed intensities after removing all-zero and zero-variance features.
+- Coloring PCA by a batch/run column (if available) is a quick way to spot technical effects.
+
+---
+
+## Session info (reproducibility)
+```{r}
+sessionInfo()
+```
