@@ -266,10 +266,7 @@ metabolomics-qc-portal-shiny/
 │  └─ report.R    # exports + HTML report render helper
 ├─ data/
 │  └─ (demo files)
-└─ docs/
-   └─ screenshots/
-      ├─ pca.png
-      └─ exports.png
+
 ```
 
 ---
@@ -289,36 +286,3 @@ Where to add new features:
 
 ---
 
-## Troubleshooting
-
-### “In metadata is all FALSE”
-- Your metadata join key is wrong, or sample names don’t match.
-- Fix:
-  - switch the join key to the correct metadata column (often `filename`)
-  - confirm sample column names (after stripping ` Peak area`) match metadata IDs
-
-### “Some selected sample columns don’t look numeric”
-- You likely selected a text/non-intensity column.
-- Fix:
-  - switch to Manual select and pick only intensity columns
-
-### Upload size errors
-- Shiny has upload limits. This app sets:
-  - `options(shiny.maxRequestSize = 300 * 1024^2)` (~300 MB)
-- If you still hit limits, reduce your file or increase the limit (not always recommended for shared servers).
-
----
-
-## Limitations
-- Designed for “feature tables that fit in memory”. Very large datasets may require:
-  - streaming reads
-  - background jobs
-  - server-side compute separation
-- QC thresholds are intentionally simple and may need assay-specific tuning.
-- This app does not do downstream metabolomics statistics (pathway enrichment, differential testing, etc.). That’s where tools like MetaboAnalyst shine.
-
----
-
-## License
-For a public portfolio repo, **MIT** is usually fine.  
-(Add a `LICENSE` file if you plan to share publicly.)
