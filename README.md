@@ -151,8 +151,3 @@ Exports include:
   ```
 
 ---
-
-## Next small upgrades (optional)
-- Add facility presets (threshold defaults by assay type)
-- Add a “batch/run QC summary” table when metadata contains `batch`/`run`
-- Add screenshots in `docs/screenshots/` for quick repo preview
